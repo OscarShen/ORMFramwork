@@ -1,5 +1,6 @@
 package com.oscarshen09.orm.bean;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,13 +20,16 @@ public class TableInfo {
 	private Map<String,ColumnInfo> columns;
 	
 	/**
-	 * 唯一主键（目前我们只能处理表中有且只有一个主键的情况）
+	 * 唯一主键
 	 */
 	private ColumnInfo onlyPriKey;
 	
-	public TableInfo() {
-		// TODO Auto-generated constructor stub
-	}
+	/**
+	 * 联合主键
+	 */
+	private List<ColumnInfo> priKeys;
+	
+	public TableInfo() {}
 
 	public TableInfo(String tname, Map<String, ColumnInfo> columns, ColumnInfo onlyPriKey) {
 		super();
@@ -33,7 +37,13 @@ public class TableInfo {
 		this.columns = columns;
 		this.onlyPriKey = onlyPriKey;
 	}
-
+	
+	public TableInfo(String tname, Map<String,ColumnInfo> columns, List<ColumnInfo> priKeys){
+		this.tname = tname;
+		this.priKeys = priKeys;
+		this.columns = columns;
+	}
+	
 	public String getTname() {
 		return tname;
 	}
@@ -57,4 +67,14 @@ public class TableInfo {
 	public void setOnlyPriKey(ColumnInfo onlyPriKey) {
 		this.onlyPriKey = onlyPriKey;
 	}
+
+	public List<ColumnInfo> getPriKeys() {
+		return priKeys;
+	}
+
+	public void setPriKeys(List<ColumnInfo> priKeys) {
+		this.priKeys = priKeys;
+	}
+	
+	
 }
