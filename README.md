@@ -1,2 +1,2 @@
 # ORMFramwork
-A somple object relational mapping framework.
+A simple object relational mapping framework.
