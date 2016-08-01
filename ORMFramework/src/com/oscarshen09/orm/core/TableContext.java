@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.oscarshen09.orm.bean.ColumnInfo;
 import com.oscarshen09.orm.bean.TableInfo;
+import com.oscarshen09.orm.utils.JavaFileUtils;
 
 /**
  * 负责获取管理数据库所有表结构和类结构的关系，并可以根据表结构生成类结构
@@ -62,6 +63,21 @@ public class TableContext {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+		
+		/******************************/
+		//更新类结构
+		updateJavaPOFile();
+	}
+	
+	/**
+	 * 根据表结构，更新配置的po包下面的java类
+	 * 实现了从表结构转化到类结构
+	 */
+	public static void updateJavaPOFile(){
+		Map<String, TableInfo> map = TableContext.tables;
+		for(TableInfo tableInfo : map.values()){
+			JavaFileUtils.createJavaPOFile(tableInfo, new MysqlTypeConvertor());
 		}
 	}
 }

@@ -1,5 +1,9 @@
 package com.oscarshen09.orm.utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +12,6 @@ import com.oscarshen09.orm.bean.ColumnInfo;
 import com.oscarshen09.orm.bean.JavaFieldGetSet;
 import com.oscarshen09.orm.bean.TableInfo;
 import com.oscarshen09.orm.core.DBManager;
-import com.oscarshen09.orm.core.MysqlTypeConvertor;
-import com.oscarshen09.orm.core.TableContext;
 import com.oscarshen09.orm.core.TypeConvertor;
 
 /**
@@ -54,6 +56,12 @@ public class JavaFileUtils {
 		return jfgs;
 	}
 	
+	/**
+	 * 生成java源码字符串
+	 * @param tableInfo 表信息
+	 * @param convertor 类型转换器
+	 * @return 源码字符串
+	 */
 	public static String createJavaSrc(TableInfo tableInfo, TypeConvertor convertor){
 		Map<String, ColumnInfo> columns = tableInfo.getColumns();
 		List<JavaFieldGetSet> javaFields = new ArrayList<>();
@@ -70,6 +78,7 @@ public class JavaFileUtils {
 		src.append("import java.sql.*;\n");
 		src.append("import java.util.*;\n\n");
 		//生成类声明语句
+		src.append("@SuppressWarnings(\"unused\")\n");
 		src.append("public class "+StringUtils.firstChar2UpperCase(tableInfo.getTname())+" {\n\n");
 		//生成属性列表
 		for(JavaFieldGetSet f : javaFields){
@@ -86,15 +95,32 @@ public class JavaFileUtils {
 		
 		//生成类结束
 		src.append("}\n");
-		System.out.println(src.toString());
 		return src.toString();
 	}
-	public static void main(String[] args) {
-//		ColumnInfo ci = new ColumnInfo("username", "varchar", 0);
-//		JavaFieldGetSet jfgs = createFieldGetSetSrc(ci, new MysqlTypeConvertor());
-//		System.out.println(jfgs);
-		Map<String,TableInfo> map = TableContext.tables;
-		TableInfo t = map.get("dept");
-		createJavaSrc(t, new MysqlTypeConvertor());
+	
+	/**
+	 * 生成java po文件
+	 * @param tableInfo 和po文件对应的表结构
+	 * @param convertor 类型转换器
+	 */
+	public static void createJavaPOFile(TableInfo tableInfo, TypeConvertor convertor){
+		String src = createJavaSrc(tableInfo, convertor);
+		String srcPath = DBManager.getConf().getSrcPath()+"\\";
+		String packagePath = DBManager.getConf().getPoPackage().replaceAll("\\.", "\\\\");
+		File f = new File(srcPath + packagePath);
+		
+		if(!f.exists()){//如果指定目录不存在，则帮助用户建立
+			f.mkdirs();
+		}
+		
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(f.getAbsolutePath() + "\\" + StringUtils.firstChar2UpperCase(tableInfo.getTname()) + ".java"));
+			bw.write(src);
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
