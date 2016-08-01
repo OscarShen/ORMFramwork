@@ -47,4 +47,8 @@ public class DBManager {
 			return null;
 		}
 	}
+	
+	public static Configuration getConf(){
+		return conf;
+	}
 }
